@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fast Summaries</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet" />
+    <meta name="keywords" content="Fastsum,Fastsum ai,abiel,Abiel,Abiel ai,abiel ai" />
+    <style>
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            margin: 0;
+            padding: 0;
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        .container {
+            background-color: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            padding: 2rem;
+            width: 90%;
+            max-width: 800px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+        }
+        h1 {
+            color: #4a4a4a;
+            text-align: center;
+            margin-bottom: 1.5rem;
+            font-weight: 600;
+        }
+        textarea {
+            width: 100%;
+            height: 150px;
+            padding: 1rem;
+            border: 2px solid #ddd;
+            border-radius: 10px;
+            resize: vertical;
+            font-family: 'Poppins', sans-serif;
+            font-size: 14px;
+            transition: border-color 0.3s ease;
+        }
+        textarea:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+        button {
+            display: block;
+            width: 100%;
+            padding: 1rem;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            margin-top: 1rem;
+        }
+        button:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+        #summary {
+            margin-top: 2rem;
+            background-color: #f8f9fa;
+            border-radius: 10px;
+            padding: 1.5rem;
+            white-space: pre-wrap;
+            line-height: 1.6;
+            font-size: 14px;
+            color: #4a4a4a;
+        }
+        .loading {
+            text-align: center;
+            color: #667eea;
+            font-weight: 600;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Fast Summaries</h1>
+        <p>By Abiel Abraham</p>
+        <textarea id="inputText" placeholder="Enter your text to summarize..."></textarea>
+        <button onclick="summarize()">Summarize</button>
+        <div id="summary"></div>
+    </div>
+
+    <script>
+        async function summarize() {
+            const inputText = document.getElementById('inputText').value;
+            const summaryElement = document.getElementById('summary');
+            
+            if (!inputText) {
+                summaryElement.textContent = 'Please enter some text to summarize.';
+                return;
+            }
+
+            summaryElement.innerHTML = '<div class="loading">Summarizing...</div>';
+
+            const API_KEY = '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'; // Replace with your actual Groq API key
+            const API_URL = 'https://api.groq.com/openai/v1/chat/completions';
+
+            try {
+                const response = await fetch(API_URL, {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${API_KEY}`,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        model: 'llama3-8b-8192',
+                        messages: [
+                            {role: 'system', content: 'You are a helpful assistant that summarizes text in 6 lines.'},
+                            {role: 'user', content: `Summarize the following text in 6 lines:\n\n${inputText}`}
+                        ]
+                    })
+                });
+
+                if (!response.ok) {
+                    throw new Error('API request failed');
+                }
+
+                const data = await response.json();
+                const summary = data.choices[0].message.content.trim();
+                summaryElement.textContent = summary;
+            } catch (error) {
+                console.error('Error:', error);
+                summaryElement.textContent = 'An error occurred while summarizing. Please try again.';
+            }
+        }
+    </script>
+
+</body>
+</html>
